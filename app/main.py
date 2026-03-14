@@ -1,10 +1,24 @@
+import time
 from fastapi import FastAPI
+from sqlalchemy.exc import OperationalError
 from . import models
 from .database import engine
 from .routes import router
 
-# Create the database tables
-models.Base.metadata.create_all(bind=engine)
+# Retry loop for Database initialization
+MAX_RETRIES = 5
+for i in range(MAX_RETRIES):
+    try:
+        # Create the database tables
+        models.Base.metadata.create_all(bind=engine)
+        print("Successfully connected to the database and created tables!")
+        break
+    except OperationalError as e:
+        print(f"Database not ready yet (Attempt {i+1}/{MAX_RETRIES}). Waiting 3 seconds...")
+        time.sleep(3)
+else:
+    raise Exception("Could not connect to the database after several retries.")
+
 
 app = FastAPI(
     title="Event Management API", 
