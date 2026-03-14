@@ -9,15 +9,20 @@ class EventBase(BaseModel):
     location: str
     start_time: datetime
     end_time: datetime
+    capacity: int = 0
+    available_seats: int = 0
 
 class EventCreate(EventBase):
     pass
 
-class EventUpdate(EventBase):
+class EventUpdate(BaseModel):
     title: Optional[str] = None
+    description: Optional[str] = None
     location: Optional[str] = None
     start_time: Optional[datetime] = None
     end_time: Optional[datetime] = None
+    capacity: Optional[int] = None
+    available_seats: Optional[int] = None
 
 class EventResponse(EventBase):
     id: int

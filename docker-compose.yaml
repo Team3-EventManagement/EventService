@@ -20,6 +20,8 @@ services:
       - "8000:8000"
     environment:
       - DATABASE_URL=postgresql://event_user:event_pass@db:5432/event_db
+      - SECRET_KEY=${SECRET_KEY:?SECRET_KEY env var must be set — must match UserService SECRET_KEY}
+      - ALGORITHM=${ALGORITHM:-HS256}
     depends_on:
       - db
     restart: always

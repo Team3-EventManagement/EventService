@@ -11,6 +11,8 @@ class Event(Base):
     location = Column(String, nullable=False)
     start_time = Column(DateTime, nullable=False)
     end_time = Column(DateTime, nullable=False)
-    
+    capacity = Column(Integer, nullable=False, default=0)
+    available_seats = Column(Integer, nullable=False, default=0)
+
     # Store the user ID from the external Authentication microservice
     owner_id = Column(Integer, index=True, nullable=False)

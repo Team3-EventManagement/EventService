@@ -1,5 +1,5 @@
 from jose import JWTError, jwt
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi import Depends, HTTPException, status
 import os
 from dotenv import load_dotenv
@@ -7,14 +7,20 @@ from . import schemas
 
 load_dotenv()
 
-SECRET_KEY = os.getenv("SECRET_KEY", "fallback_secret_key_for_development")
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    raise RuntimeError(
+        "SECRET_KEY environment variable is not set. "
+        "It must match the SECRET_KEY used by UserService to sign JWTs."
+    )
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 
-# The token URL should point to your external Authentication service. 
-# Leaving it as login for Swagger UI documentation purposes right now.
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/login")
+# HTTPBearer reads the token from the Authorization: Bearer <token> header.
+# This service does NOT issue tokens — it only validates tokens signed by UserService.
+security = HTTPBearer()
 
-def get_current_user(token: str = Depends(oauth2_scheme)):
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
